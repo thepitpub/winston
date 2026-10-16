@@ -1,0 +1,7 @@
+.env*
+!.env.example
+relatorios
+test-results
+playwright-report
+supabase/.temp
+*.tsbuildinfo
