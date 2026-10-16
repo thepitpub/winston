@@ -29,7 +29,10 @@ export type Ambiente = z.infer<typeof Esquema>
 let cache: Ambiente | null = null
 export function ambiente(): Ambiente {
   if (cache) return cache
-  const r = Esquema.safeParse(process.env)
+  // Na Vercel, sem CH_URL definido, os links de convite usam o domínio de
+  // produção que a própria Vercel informa (variável de sistema).
+  const vercel = process.env.VERCEL_PROJECT_PRODUCTION_URL
+  const r = Esquema.safeParse({ ...process.env, CH_URL: process.env.CH_URL || (vercel ? `https://${vercel}` : undefined) })
   if (!r.success) {
     const faltas = r.error.issues.map((i) => `${i.path.join('.')}: ${i.message}`).join('; ')
     throw new Error(`Ambiente inválido: ${faltas}`)
