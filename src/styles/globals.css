@@ -1,0 +1,339 @@
+@import 'tailwindcss';
+
+/* =========================================================================
+   CONTINENTAL HERITAGE — tokens
+   A casa troca de pele como um hotel troca de salão: o Lobby é obsidiana
+   e ouro; o Registro é o papel marfim do livro de hóspedes; o Veludo é a
+   sala bordô onde se decide; o Bronze guarda as moedas.
+
+   Cada componente consome PAPÉIS (fundo, tinta, destaque…), nunca a cor
+   crua. Uma seção com data-atmosfera redefine os papéis e tudo dentro
+   dela muda junto. Contraste (WCAG 2.2 AA) medido para cada atmosfera:
+   tinta, tinta-2 e apagado passam 4,5:1 para texto corrido; discreto passa
+   4,5:1 para rótulo; destaque passa 4,5:1 sobre fundo e elevado.
+
+   Tipografia emprestada do Wine Garden e casada com o Continental:
+   Instrument Serif é a voz da casa (títulos, nomes, números grandes, com o
+   itálico como inflexão); JetBrains Mono é o balcão, a ficha e o telégrafo
+   (interface, rótulos, códigos). Nenhuma imagem: só tipo, filete e SVG.
+   ========================================================================= */
+
+@theme {
+  /* Cores fixas da marca: para o que NUNCA muda com a atmosfera
+     (fundo do QR, cartão da credencial, selo). */
+  --color-marfim: #eae4d9;
+  --color-obsidiana: #0b0d0f;
+  --color-ouro: #b99a62;
+  --color-burgundy: #512c35;
+  --color-burgundy-bright: #7a4552;
+  --color-bronze: #554632;
+
+  /* Papéis — valores do Lobby; as atmosferas abaixo redefinem. */
+  --color-fundo: #0b0d0f;
+  --color-fundo-2: #0f1215;
+  --color-elevado: #171a1e;
+  --color-elevado-2: #1e2227;
+  --color-elevado-3: #262b31;
+  --color-tinta: #eae4d9;
+  --color-tinta-2: #c9c3b8;
+  --color-apagado: #a2a7ac;
+  --color-discreto: #8b9095;
+  --color-destaque: #b99a62;
+  --color-destaque-vivo: #d2b67e;
+  --color-destaque-fundo: #8a7246;
+  --color-sobre-destaque: #0b0d0f;
+  --color-ok: #8fae8b;
+  --color-attention: #d3a85b;
+  --color-danger: #d08a94;
+  --color-info: #8fa7b8;
+
+  --font-display: var(--font-instrument), 'Instrument Serif', Georgia, 'Times New Roman', serif;
+  --font-sans: var(--font-jetbrains), 'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+  --font-mono: var(--font-jetbrains), 'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+
+  --radius-xs: 2px;
+  --radius-sm: 4px;
+
+  --ease-brand: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-mask: cubic-bezier(0.76, 0, 0.24, 1);
+
+  /* Escala display — deliberadamente grande, como no Wine Garden. */
+  --text-display-mega: clamp(3.6rem, 13vw, 11rem);
+  --text-display-mega--line-height: 0.86;
+  --text-display-xl: clamp(3rem, 9vw, 7.5rem);
+  --text-display-xl--line-height: 0.88;
+  --text-display-lg: clamp(2.5rem, 6.4vw, 5.25rem);
+  --text-display-lg--line-height: 0.92;
+  --text-display-md: clamp(1.9rem, 4vw, 3.15rem);
+  --text-display-md--line-height: 1;
+  --text-display-sm: clamp(1.45rem, 2.6vw, 2.1rem);
+  --text-display-sm--line-height: 1.05;
+  --text-label: 0.6875rem;
+  --text-label--line-height: 1.35;
+}
+
+:root {
+  color-scheme: dark;
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --fio: color-mix(in oklab, var(--color-tinta) 12%, transparent);
+  --fio-forte: color-mix(in oklab, var(--color-destaque) 42%, transparent);
+  /* O traço pontilhado da casa: ouro no escuro, ouro velho no papel. */
+  --traco: var(--color-destaque);
+  --cabecalho-h: 4.5rem;
+  /* Textura: ruído fractal em SVG, sem pixel de imagem. */
+  --textura: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 .92  0 0 0 0 .89  0 0 0 0 .85  0 0 0 .55 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+}
+
+@media (min-width: 1024px) {
+  :root {
+    --cabecalho-h: 5.25rem;
+  }
+}
+
+/* ------------------------------------------------------------ atmosferas */
+
+/* Lobby — obsidiana e ouro. O padrão da casa. */
+[data-atmosfera='lobby'] {
+  color-scheme: dark;
+  --color-fundo: #0b0d0f;
+  --color-fundo-2: #0f1215;
+  --color-elevado: #171a1e;
+  --color-elevado-2: #1e2227;
+  --color-elevado-3: #262b31;
+  --color-tinta: #eae4d9;
+  --color-tinta-2: #c9c3b8;
+  --color-apagado: #a2a7ac;
+  --color-discreto: #8b9095;
+  --color-destaque: #b99a62;
+  --color-destaque-vivo: #d2b67e;
+  --color-destaque-fundo: #8a7246;
+  --color-sobre-destaque: #0b0d0f;
+  --color-ok: #8fae8b;
+  --color-attention: #d3a85b;
+  --color-danger: #d08a94;
+  --color-info: #8fa7b8;
+  --traco: #b99a62;
+}
+
+/* Registro — o livro de hóspedes. Papel marfim, tinta obsidiana, bordô. */
+[data-atmosfera='registro'] {
+  color-scheme: light;
+  --color-fundo: #eae4d9;
+  --color-fundo-2: #e2dbce;
+  --color-elevado: #f3efe7;
+  --color-elevado-2: #e6dfd2;
+  --color-elevado-3: #d9d1c2;
+  --color-tinta: #0b0d0f;
+  --color-tinta-2: #2b2d30;
+  --color-apagado: #4a4e52;
+  --color-discreto: #5c6064;
+  --color-destaque: #512c35;
+  --color-destaque-vivo: #6e3a47;
+  --color-destaque-fundo: #3c1f27;
+  --color-sobre-destaque: #eae4d9;
+  --color-ok: #2f5d2c;
+  --color-attention: #7a4d0e;
+  --color-danger: #8c2533;
+  --color-info: #2b4f66;
+  --traco: #8a7246;
+}
+
+/* Veludo — a sala bordô do Winston: o momento de pedir e decidir. */
+[data-atmosfera='veludo'] {
+  color-scheme: dark;
+  --color-fundo: #3d1f27;
+  --color-fundo-2: #33191f;
+  --color-elevado: #4a2630;
+  --color-elevado-2: #562d38;
+  --color-elevado-3: #633442;
+  --color-tinta: #eae4d9;
+  --color-tinta-2: #ddd3c7;
+  --color-apagado: #c9bab2;
+  --color-discreto: #b5a49d;
+  --color-destaque: #d2b67e;
+  --color-destaque-vivo: #e0c891;
+  --color-destaque-fundo: #b99a62;
+  --color-sobre-destaque: #2a1419;
+  --color-ok: #b5d1b0;
+  --color-attention: #e8c27a;
+  --color-danger: #f0b3bc;
+  --color-info: #b8cad8;
+  --traco: #d2b67e;
+}
+
+/* Bronze — o cofre das Gold Coins. */
+[data-atmosfera='bronze'] {
+  color-scheme: dark;
+  --color-fundo: #1f1a12;
+  --color-fundo-2: #19150e;
+  --color-elevado: #2a2419;
+  --color-elevado-2: #352d20;
+  --color-elevado-3: #43392a;
+  --color-tinta: #eae4d9;
+  --color-tinta-2: #d6ccbb;
+  --color-apagado: #bbae98;
+  --color-discreto: #a69983;
+  --color-destaque: #d2b67e;
+  --color-destaque-vivo: #e0c891;
+  --color-destaque-fundo: #b99a62;
+  --color-sobre-destaque: #1f1a12;
+  --color-ok: #a9c7a4;
+  --color-attention: #e0bb72;
+  --color-danger: #e3a3ac;
+  --color-info: #a9bccb;
+  --traco: #d2b67e;
+}
+
+[data-atmosfera] {
+  background-color: var(--color-fundo);
+  color: var(--color-tinta);
+}
+
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+    background: var(--color-fundo);
+    scroll-padding-top: calc(var(--cabecalho-h) + 1rem);
+  }
+  body {
+    min-height: 100dvh;
+    background: var(--color-fundo);
+    color: var(--color-tinta);
+    font-family: var(--font-sans);
+    font-size: 0.9375rem;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    -webkit-tap-highlight-color: transparent;
+    overflow-x: clip;
+  }
+  h1,
+  h2,
+  h3 {
+    text-wrap: balance;
+  }
+  .font-display {
+    font-weight: 400;
+    letter-spacing: -0.025em;
+    font-variant-numeric: lining-nums;
+  }
+  ::selection {
+    background: color-mix(in oklab, var(--color-destaque) 45%, transparent);
+    color: var(--color-tinta);
+  }
+  :focus-visible {
+    outline: 2px solid var(--color-destaque-vivo);
+    outline-offset: 3px;
+  }
+  input,
+  textarea,
+  select {
+    font-size: 16px; /* o iOS não aproxima a tela em 16px */
+  }
+}
+
+@layer components {
+  /* Rótulo de balcão: mono em caixa alta, entreletra aberta. */
+  .rotulo {
+    font-family: var(--font-mono);
+    font-size: var(--text-label);
+    font-weight: 500;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+  }
+  .numerico {
+    font-variant-numeric: lining-nums tabular-nums;
+    font-feature-settings: 'tnum' 1;
+  }
+  /* A inflexão da casa: segunda linha do título em itálico, na cor do destaque. */
+  .inflexao {
+    font-style: italic;
+    color: var(--color-destaque);
+  }
+  .textura {
+    position: relative;
+    isolation: isolate;
+  }
+  .textura::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    background-image: var(--textura);
+    opacity: 0.04;
+    mix-blend-mode: overlay;
+  }
+  [data-atmosfera='registro'] .textura::after,
+  .textura[data-atmosfera='registro']::after {
+    opacity: 0.09;
+    mix-blend-mode: multiply;
+  }
+  /* Superfície de interface: só onde a coisa é um objeto (diálogo, card). */
+  .placa {
+    position: relative;
+    background: var(--color-elevado);
+    box-shadow: inset 0 0 0 1px var(--fio);
+  }
+  .filete {
+    height: 1px;
+    background: var(--fio);
+  }
+  /* Pontilhado de livro-caixa: "Saldo ........ 120". */
+  .pontilhado {
+    flex: 1;
+    min-width: 1.5rem;
+    align-self: end;
+    margin-bottom: 0.32em;
+    border-bottom: 1px dotted color-mix(in oklab, var(--color-tinta) 38%, transparent);
+  }
+  .sublinha-traco {
+    background: linear-gradient(currentColor, currentColor) left bottom / 0 1px no-repeat;
+    transition: background-size 0.42s var(--ease-brand);
+  }
+  .sublinha-traco:hover,
+  .sublinha-traco[aria-current='page'] {
+    background-size: 100% 1px;
+  }
+  .esqueleto {
+    background: linear-gradient(90deg, var(--color-elevado-2), var(--color-elevado-3), var(--color-elevado-2));
+    background-size: 200% 100%;
+    animation: brilho 1.6s linear infinite;
+    border-radius: var(--radius-xs);
+  }
+  @keyframes brilho {
+    to {
+      background-position: -200% 0;
+    }
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 1ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 1ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+@keyframes menu-entra {
+  from {
+    clip-path: inset(0 0 100% 0);
+  }
+  to {
+    clip-path: inset(0 0 0 0);
+  }
+}
+@keyframes sobe {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
