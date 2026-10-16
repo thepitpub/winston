@@ -3,8 +3,9 @@
 import { redirect } from 'next/navigation'
 import { z } from 'zod'
 import { executar, ErroDeRegra, formulario, type Resultado } from '@/lib/acao'
-import { ambiente } from '@/lib/ambiente'
+import { ambiente, modoApresentacao } from '@/lib/ambiente'
 import { conferirDesafio, conferirLimiteMfa, criarDesafio, emitirSessao, garantirContaDoMembro, lerConvite } from '@/lib/aplicacao/acesso'
+import { garantirMembroDemonstracao } from '@/lib/aplicacao/demonstracao'
 import { auditar } from '@/lib/auditoria'
 import { membroDaSessao, temFatorVerificado } from '@/lib/autorizacao/membro'
 import { sair } from '@/lib/autorizacao/sessao'
@@ -19,6 +20,23 @@ const Telefone = z.string().transform((v, ctx) => {
 const Codigo = z.string().regex(/^\d{6}$/, 'O código tem 6 dígitos.')
 
 export type EstadoLogin = Resultado<{ etapa: 'codigo' | 'feito'; telefone?: string; manual?: boolean }> | null
+
+/* ------------------------------------------------------- as portas abertas */
+
+/**
+ * MODO APRESENTAÇÃO. As portas do Continental abrem para o membro de
+ * DEMONSTRAÇÃO (sintético), nunca para um membro real. Não redireciona: a
+ * tela espera as portas terminarem de abrir e então navega.
+ */
+export async function entrarPelasPortas(): Promise<Resultado> {
+  return executar(async () => {
+    if (!modoApresentacao()) throw new ErroDeRegra('A entrada direta está fechada. Use o telefone cadastrado.')
+    const userId = await garantirMembroDemonstracao()
+    await emitirSessao(userId)
+    await auditar({ ator: { userId, tipo: 'member' }, acao: 'apresentacao.entrada' })
+    return undefined
+  })
+}
 
 /* ------------------------------------------------------------------ login */
 

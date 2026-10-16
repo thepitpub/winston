@@ -22,6 +22,9 @@ const Esquema = z.object({
   WHATSAPP_TEMPLATE_IDIOMA: z.string().default('pt_BR'),
   CH_IA_PROVEDOR: z.enum(['nenhum']).default('nenhum'),
   CH_DEV_ATALHO: z.string().optional(),
+  // 1 = a entrada do Portal vira as portas do Continental: um botão leva ao
+  // membro de DEMONSTRAÇÃO (sintético). Para apresentações. Não afeta o Command.
+  CH_MODO_APRESENTACAO: z.string().optional(),
 })
 
 export type Ambiente = z.infer<typeof Esquema>
@@ -44,4 +47,9 @@ export function ambiente(): Ambiente {
 /** Atalho de desenvolvimento: nunca em produção, por construção. */
 export function atalhoDevLigado(): boolean {
   return process.env.NODE_ENV !== 'production' && ambiente().CH_DEV_ATALHO === '1'
+}
+
+/** Modo apresentação: a entrada do Portal abre como membro de demonstração. */
+export function modoApresentacao(): boolean {
+  return ambiente().CH_MODO_APRESENTACAO === '1'
 }

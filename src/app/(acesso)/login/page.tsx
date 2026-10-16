@@ -1,6 +1,8 @@
 import type { Metadata } from 'next'
 import { Porta } from '@/components/portal/Porta'
+import { modoApresentacao } from '@/lib/ambiente'
 import { FormLogin } from './FormLogin'
+import { Portas } from './Portas'
 
 export const metadata: Metadata = { title: 'Entrada' }
 
@@ -10,6 +12,8 @@ const ERROS: Record<string, string> = {
 
 export default async function Login({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }) {
   const { e } = await searchParams
+  // Modo apresentação: as portas do Continental, um botão só.
+  if (modoApresentacao()) return <Portas />
   return (
     <Porta sobretitulo="Continental Heritage" titulo="A recepção." texto="Informe o telefone cadastrado. Enviamos um código de uso único; depois, o seu autenticador confirma que é você.">
       {typeof e === 'string' && ERROS[e] ? (

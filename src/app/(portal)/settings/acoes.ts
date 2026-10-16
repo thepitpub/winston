@@ -2,13 +2,22 @@
 
 import { revalidatePath } from 'next/cache'
 import { z } from 'zod'
-import { ambiente, atalhoDevLigado } from '@/lib/ambiente'
+import { ambiente, atalhoDevLigado, modoApresentacao } from '@/lib/ambiente'
 import { executar, ErroDeRegra, formulario, type Resultado } from '@/lib/acao'
 import { conferirDesafio, criarDesafio } from '@/lib/aplicacao/acesso'
 import { auditar } from '@/lib/auditoria'
 import { exigirMembro } from '@/lib/autorizacao/membro'
 import { clienteSecreto, feito, talvez } from '@/lib/db/clientes'
 import { paraE164 } from '@/lib/dominio/telefone'
+
+/**
+ * No modo apresentação muita gente divide o MESMO membro de demonstração:
+ * nome, telefone e sessões alheias ficam travados para ninguém estragar a
+ * vitrine do outro.
+ */
+function travaDaDemonstracao(m: { is_synthetic: boolean }) {
+  if (m.is_synthetic && modoApresentacao()) throw new ErroDeRegra('Indisponível no modo apresentação.')
+}
 
 const lista = (v: string | undefined) => (v ?? '').split(/[;,]/).map((x) => x.trim()).filter(Boolean).slice(0, 15)
 
@@ -71,6 +80,7 @@ export async function salvarDiretorio(_: Resultado | null, fd: FormData): Promis
 export async function salvarNome(_: Resultado | null, fd: FormData): Promise<Resultado> {
   return executar(async () => {
     const { membro, id } = await exigirMembro()
+    travaDaDemonstracao(membro)
     const { nome } = z.object({ nome: z.string().trim().min(1, 'Informe um nome.').max(80) }).parse(formulario(fd))
     feito(await clienteSecreto().from('members').update({ display_name: nome }).eq('id', membro.id))
     await auditar({ ator: { userId: id.userId, tipo: 'member' }, acao: 'perfil.editado', membroId: membro.id, detalhes: { campos: ['display_name'] } })
@@ -86,6 +96,7 @@ export type EstadoTelefone = Resultado<{ etapa: 'codigo'; telefone: string; manu
 export async function pedirTrocaTelefone(_: EstadoTelefone, fd: FormData): Promise<EstadoTelefone> {
   return executar(async () => {
     const { membro, id } = await exigirMembro()
+    travaDaDemonstracao(membro)
     if (id.aal !== 'aal2' && !(membro.is_synthetic && atalhoDevLigado())) throw new ErroDeRegra('Confirme o autenticador antes de trocar o telefone.')
     const telefone = paraE164(String(fd.get('telefone') ?? ''))
     if (!telefone) throw new ErroDeRegra('Telefone inválido.', { telefone: 'Telefone inválido.' })
@@ -98,6 +109,7 @@ export async function pedirTrocaTelefone(_: EstadoTelefone, fd: FormData): Promi
 export async function confirmarTrocaTelefone(_: EstadoTelefone, fd: FormData): Promise<EstadoTelefone> {
   return executar(async () => {
     const { membro, id } = await exigirMembro()
+    travaDaDemonstracao(membro)
     const d = z.object({ telefone: z.string(), codigo: z.string().regex(/^\d{6}$/, 'O código tem 6 dígitos.') }).parse(formulario(fd))
     const telefone = paraE164(d.telefone)
     if (!telefone) throw new ErroDeRegra('Telefone inválido.')
@@ -118,6 +130,7 @@ export async function confirmarTrocaTelefone(_: EstadoTelefone, fd: FormData): P
 export async function encerrarSessao(sessaoId: string): Promise<Resultado> {
   return executar(async () => {
     const { membro, id } = await exigirMembro()
+    travaDaDemonstracao(membro)
     const s = z.uuid().parse(sessaoId)
     if (s === id.sessionId) throw new ErroDeRegra('Para esta sessão, use "Sair".')
     const adm = clienteSecreto()

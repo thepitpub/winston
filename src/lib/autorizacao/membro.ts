@@ -1,7 +1,7 @@
 import 'server-only'
 import { redirect } from 'next/navigation'
 import { cache } from 'react'
-import { atalhoDevLigado } from '../ambiente'
+import { atalhoDevLigado, modoApresentacao } from '../ambiente'
 import { clienteDoUsuario, clienteSecreto } from '../db/clientes'
 import { identidade, type Identidade } from './sessao'
 
@@ -51,7 +51,7 @@ export async function exigirMembro(opcoes: { onboarding?: boolean } = {}): Promi
   if (membro.status === 'suspended' || membro.status === 'revoked') redirect('/login?e=acesso_suspenso')
   if (opcoes.onboarding) return s
   if (membro.status !== 'active') redirect('/onboarding')
-  if (id.aal !== 'aal2' && !(membro.is_synthetic && atalhoDevLigado()) && (await mfaObrigatorio())) {
+  if (id.aal !== 'aal2' && !(membro.is_synthetic && (atalhoDevLigado() || modoApresentacao())) && (await mfaObrigatorio())) {
     redirect((await temFatorVerificado()) ? '/login/mfa' : '/onboarding')
   }
   return s

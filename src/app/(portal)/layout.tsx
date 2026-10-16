@@ -2,6 +2,7 @@ import { Abertura } from '@/components/movimento/Abertura'
 import { BarraMovel, Cabecalho } from '@/components/portal/Cabecalho'
 import { Comunicados } from '@/components/portal/Comunicados'
 import { ServiceBell } from '@/components/portal/ServiceBell'
+import { modoApresentacao } from '@/lib/ambiente'
 import { exigirMembro } from '@/lib/autorizacao/membro'
 
 /**
@@ -23,7 +24,7 @@ export default async function PortalLayout({ children }: { children: React.React
       <Abertura />
       <Cabecalho nome={nome} />
       <div className="pt-[calc(var(--cabecalho-h)+var(--safe-top))]">
-        {membro.is_synthetic ? <p className="rotulo bg-bronze px-5 py-1.5 text-center !text-[0.62rem] text-marfim">Sessão de demonstração · membro sintético · ambiente de desenvolvimento</p> : null}
+        {membro.is_synthetic ? <p className="rotulo bg-bronze px-5 py-1.5 text-center !text-[0.62rem] text-marfim">{modoApresentacao() ? 'Modo apresentação · membro de demonstração · nada aqui é dado real' : 'Sessão de demonstração · membro sintético · ambiente de desenvolvimento'}</p> : null}
         <Comunicados />
       </div>
       <main id="conteudo" className="flex-1 pb-[calc(4.5rem+var(--safe-bottom))] sm:pb-0">
