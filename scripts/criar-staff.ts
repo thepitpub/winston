@@ -67,7 +67,11 @@ async function main() {
   else console.log('  Pessoa já existia: papel e concessões ajustados.\n')
 }
 
-main().catch((e) => {
+// Sai explicitamente: o cliente do Supabase mantém conexões abertas e o
+// processo ficaria parado, segurando a senha provisória no buffer da saída.
+main()
+  .then(() => process.exit(0))
+  .catch((e) => {
   console.error(`✗ ${e.message}`)
   process.exit(1)
 })
